@@ -138,15 +138,16 @@ class DisplayManager:
         return layout
         
     def _update_live_display(
-        self, 
-        layout: Layout, 
-        watts: float, 
-        trend_data: Optional[Dict[str, Any]], 
+        self,
+        layout: Layout,
+        watts: float,
+        trend_data: Optional[Dict[str, Any]],
         source: str,
         timestamp: float,
         current_amperes: Optional[float] = None,
         current_trend_data: Optional[Dict[str, Any]] = None,
-        show_current: bool = False
+        show_current: bool = False,
+        energy_config: Optional[Dict] = None,
     ) -> None:
         """Update the live display with current data."""
         color = self.get_color_for_watts(watts)
@@ -208,7 +209,27 @@ class DisplayManager:
             else:
                 kwh = avg_watts / 1000
                 energy_table.add_row("Used (est.)", f"{kwh:.3f} kWh/hour")
-        
+
+        # Add cost rows if energy config has a rate
+        if energy_config and energy_config.get("rate"):
+            from .cost import calculate_cost, format_cost
+
+            rate = energy_config["rate"]
+            symbol = energy_config.get("currency_symbol", "$")
+            ref_watts = trend_data["avg"] if trend_data else watts
+            energy_table.add_row(
+                "Cost/hour",
+                format_cost(calculate_cost(ref_watts, rate, 1), symbol),
+            )
+            energy_table.add_row(
+                "Cost/day",
+                format_cost(calculate_cost(ref_watts, rate, 24), symbol),
+            )
+            energy_table.add_row(
+                "Cost/month",
+                format_cost(calculate_cost(ref_watts, rate, 24 * 30), symbol),
+            )
+
         source_table = Table(box=box.ROUNDED, show_header=False, title_justify="center", title="Source", padding=(0, 1), width=table_width)
         source_table.add_column("Metric", style="bright_blue", width=col1_width)
         source_table.add_column("Value", width=col2_width)
@@ -459,18 +480,19 @@ class DisplayManager:
         return line_chart_table
     
     def display_continuous_usage(
-        self, 
-        get_power_callback, 
-        get_power_trend_callback, 
-        source: str, 
+        self,
+        get_power_callback,
+        get_power_trend_callback,
+        source: str,
         interval: int,
         get_current_callback=None,
         get_current_trend_callback=None,
         show_current: bool = False,
-        raw: bool = False
+        raw: bool = False,
+        energy_config: Optional[Dict] = None,
     ) -> None:
         """Display continuous power usage with updates at specified intervals.
-        
+
         Args:
             get_power_callback: Callback function to get current power usage
             get_power_trend_callback: Callback function to get power usage trend
@@ -480,6 +502,7 @@ class DisplayManager:
             get_current_trend_callback: Optional callback function to get current amperage trend
             show_current: Whether to show current (amperage) data
             raw: Whether to output only raw values for scripting use
+            energy_config: Optional energy cost configuration
         """
         
         if raw:
@@ -532,7 +555,7 @@ class DisplayManager:
                                 current_trend = get_current_trend_callback(5)
                             
 
-                            self._update_live_display(layout, watts, power_trend, source, current_time, amperes, current_trend, show_current)
+                            self._update_live_display(layout, watts, power_trend, source, current_time, amperes, current_trend, show_current, energy_config=energy_config)
                             last_stat_update = current_time
                     
 
