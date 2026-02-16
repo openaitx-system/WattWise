@@ -66,3 +66,6 @@ config.yaml
 .wattwise.yaml
 local/
 power_optimizer/
+
+# Local dirs
+tasks/
