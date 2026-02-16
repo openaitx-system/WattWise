@@ -1,5 +1,6 @@
-from setuptools import setup, find_packages
 import re
+
+from setuptools import find_packages, setup
 
 # Read version from the __init__ file
 with open("wattwise/__init__.py", encoding="utf-8") as f:
@@ -10,7 +11,9 @@ setup(
     version=version,
     author="Naveen",
     author_email="hey@naveen.ing",
-    description="A CLI tool for monitoring power usage by devices plugged into smart plugs",
+    description=(
+        "A CLI tool for monitoring power usage " "by devices plugged into smart plugs"
+    ),
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/naveenkul/wattwise",

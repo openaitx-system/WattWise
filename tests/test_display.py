@@ -1,7 +1,6 @@
 """Tests for wattwise.display module."""
 
 from io import StringIO
-from unittest.mock import patch
 
 import pytest
 from rich.console import Console
@@ -65,9 +64,7 @@ class TestDisplayCurrentUsage:
 
     def test_displays_with_current(self, display_mgr):
         display_mgr.console = Console(file=StringIO())
-        display_mgr.display_current_usage(
-            150.0, "Test Source", current_amperes=1.5
-        )
+        display_mgr.display_current_usage(150.0, "Test Source", current_amperes=1.5)
         assert len(display_mgr.current_history) == 1
 
 

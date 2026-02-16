@@ -1,6 +1,6 @@
 """Type definitions for WattWise configuration and data structures."""
 
-from typing import Any, TypedDict
+from typing import TypedDict
 
 
 class HomeAssistantConfig(TypedDict):

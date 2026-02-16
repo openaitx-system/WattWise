@@ -1,8 +1,7 @@
 """Tests for wattwise.cli module."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
 from typer.testing import CliRunner
 
 from wattwise.cli import app
@@ -84,7 +83,12 @@ class TestCostCommand:
     @patch("wattwise.cli.config")
     def test_cost_basic(self, mock_config):
         mock_config.load_config.return_value = {
-            "homeassistant": {"host": "", "token": "", "entity_id": "", "current_entity_id": ""},
+            "homeassistant": {
+                "host": "",
+                "token": "",
+                "entity_id": "",
+                "current_entity_id": "",
+            },
             "kasa": {"device_ip": "", "alias": "PC"},
         }
         result = runner.invoke(app, ["cost", "--watts", "500"])
@@ -96,7 +100,12 @@ class TestCostCommand:
     @patch("wattwise.cli.config")
     def test_cost_custom_rate(self, mock_config):
         mock_config.load_config.return_value = {
-            "homeassistant": {"host": "", "token": "", "entity_id": "", "current_entity_id": ""},
+            "homeassistant": {
+                "host": "",
+                "token": "",
+                "entity_id": "",
+                "current_entity_id": "",
+            },
             "kasa": {"device_ip": "", "alias": "PC"},
         }
         result = runner.invoke(app, ["cost", "--watts", "1000", "--rate", "0.25"])
@@ -121,7 +130,12 @@ class TestDevicesCommand:
     @patch("wattwise.cli.config")
     def test_devices_list_empty(self, mock_config):
         mock_config.load_config.return_value = {
-            "homeassistant": {"host": "", "token": "", "entity_id": "", "current_entity_id": ""},
+            "homeassistant": {
+                "host": "",
+                "token": "",
+                "entity_id": "",
+                "current_entity_id": "",
+            },
             "kasa": {"device_ip": "", "alias": "PC"},
         }
         result = runner.invoke(app, ["devices", "list"])
@@ -131,7 +145,12 @@ class TestDevicesCommand:
     @patch("wattwise.cli.config")
     def test_devices_list_with_devices(self, mock_config):
         mock_config.load_config.return_value = {
-            "homeassistant": {"host": "", "token": "", "entity_id": "", "current_entity_id": ""},
+            "homeassistant": {
+                "host": "",
+                "token": "",
+                "entity_id": "",
+                "current_entity_id": "",
+            },
             "kasa": {"device_ip": "192.168.1.100", "alias": "TestPlug"},
         }
         result = runner.invoke(app, ["devices", "list"])
@@ -139,9 +158,7 @@ class TestDevicesCommand:
         assert "TestPlug" in result.output
 
     @patch("wattwise.cli.config")
-    def test_devices_list_ignores_legacy_when_devices_key_present(
-        self, mock_config
-    ):
+    def test_devices_list_ignores_legacy_when_devices_key_present(self, mock_config):
         mock_config.load_config.return_value = {
             "devices": [],
             "homeassistant": {

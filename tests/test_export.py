@@ -106,9 +106,7 @@ class TestExportFilters:
         output = str(tmp_path / "export.csv")
         # Use a timestamp between record 1 and record 2 (local timezone safe)
         start_str = datetime.fromtimestamp(1700000030.0).isoformat()
-        count = export_history(
-            history_file, output, fmt="csv", start=start_str
-        )
+        count = export_history(history_file, output, fmt="csv", start=start_str)
         assert count == 2
 
     def test_filter_by_end(self, history_file, tmp_path):
@@ -117,9 +115,7 @@ class TestExportFilters:
         output = str(tmp_path / "export.csv")
         # Use a timestamp between record 1 and record 2
         end_str = datetime.fromtimestamp(1700000030.0).isoformat()
-        count = export_history(
-            history_file, output, fmt="csv", end=end_str
-        )
+        count = export_history(history_file, output, fmt="csv", end=end_str)
         assert count == 1
 
 

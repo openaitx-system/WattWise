@@ -19,9 +19,7 @@ class AlertManager:
         self.enabled: bool = alert_cfg.get("enabled", False)
         self.threshold: float = alert_cfg.get("threshold", 1000)
         self.sustained_seconds: int = alert_cfg.get("sustained_seconds", 60)
-        self.notifications: list[dict[str, Any]] = alert_cfg.get(
-            "notifications", []
-        )
+        self.notifications: list[dict[str, Any]] = alert_cfg.get("notifications", [])
         self._above_threshold_since: float | None = None
         self._alert_sent: bool = False
 
@@ -68,9 +66,7 @@ class AlertManager:
                 else:
                     logger.warning(f"Unknown notification type: {notif_type}")
             except Exception as e:
-                logger.warning(
-                    f"Failed to send {notif_type} notification: {e}"
-                )
+                logger.warning(f"Failed to send {notif_type} notification: {e}")
 
     def _send_webhook(self, notif: dict[str, Any], message: str) -> None:
         """Send a webhook notification."""

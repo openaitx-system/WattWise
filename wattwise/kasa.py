@@ -10,7 +10,6 @@ import json
 import logging
 import os
 import time
-from datetime import datetime
 from typing import Any
 
 from rich.console import Console
@@ -98,15 +97,14 @@ class KasaDevice:
                 kwargs["username"] = self.username
                 kwargs["password"] = self.password
 
-            self.device = await Discover.discover_single(
-                self.device_ip, **kwargs
-            )
-            await self.device.update()
+            device = await Discover.discover_single(self.device_ip, **kwargs)
+            if device is None:
+                return False, f"No device found at {self.device_ip}"
+            self.device = device
+            await device.update()
             return True, None
         except TimeoutError:
-            error_msg = (
-                f"Connection to {self.device_ip} timed out after 10 seconds"
-            )
+            error_msg = f"Connection to {self.device_ip} timed out after 10 seconds"
             logger.error(error_msg)
             return False, error_msg
         except ConnectionRefusedError:
@@ -114,9 +112,7 @@ class KasaDevice:
             logger.error(error_msg)
             return False, error_msg
         except Exception as e:
-            logger.error(
-                f"Failed to connect to Kasa device at {self.device_ip}: {e}"
-            )
+            logger.error(f"Failed to connect to Kasa device at {self.device_ip}: {e}")
             return False, str(e)
 
     def validate_connection(self) -> tuple[bool, str | None]:
@@ -248,9 +244,7 @@ class KasaDevice:
                     }
                 )
             else:
-                info.update(
-                    {"current_consumption": 0, "voltage": 0, "current": 0}
-                )
+                info.update({"current_consumption": 0, "voltage": 0, "current": 0})
 
             return info
         except Exception as e:
@@ -270,9 +264,7 @@ class KasaDevice:
             "current": 0,
         }
 
-    def get_power_trend(
-        self, minutes: int = 5
-    ) -> dict[str, Any] | None:
+    def get_power_trend(self, minutes: int = 5) -> dict[str, Any] | None:
         """Get power usage trend data for the past X minutes."""
         if not self.history:
             return None
@@ -280,9 +272,7 @@ class KasaDevice:
         now = time.time()
         cutoff = now - (minutes * 60)
 
-        relevant_history = [
-            (t, p) for t, p in self.history if t >= cutoff
-        ]
+        relevant_history = [(t, p) for t, p in self.history if t >= cutoff]
 
         if len(relevant_history) < 2:
             return None
@@ -298,9 +288,7 @@ class KasaDevice:
             "period_minutes": minutes,
         }
 
-    def get_current_trend(
-        self, minutes: int = 5
-    ) -> dict[str, Any] | None:
+    def get_current_trend(self, minutes: int = 5) -> dict[str, Any] | None:
         """Get current amperage trend data for the past X minutes."""
         if not self.current_history:
             return None
@@ -308,9 +296,7 @@ class KasaDevice:
         now = time.time()
         cutoff = now - (minutes * 60)
 
-        relevant_history = [
-            (t, c) for t, c in self.current_history if t >= cutoff
-        ]
+        relevant_history = [(t, c) for t, c in self.current_history if t >= cutoff]
 
         if len(relevant_history) < 2:
             return None
@@ -350,7 +336,7 @@ async def discover_devices(
         if username and password:
             kwargs["credentials"] = Credentials(username, password)
 
-        devices = await Discover.discover(**kwargs)
+        devices: dict[str, Any] = await Discover.discover(**kwargs)
         return devices
     except Exception as e:
         logger.error(f"Error discovering devices: {e}")
@@ -362,9 +348,7 @@ def display_discovered_devices(
 ) -> list[dict[str, Any]]:
     """Display discovered devices in a table and return device info list."""
     if not devices:
-        console.print(
-            "[yellow]No Kasa devices found on your network.[/yellow]"
-        )
+        console.print("[yellow]No Kasa devices found on your network.[/yellow]")
         console.print(
             "Make sure your devices are powered on and connected to the same network."
         )
@@ -397,9 +381,7 @@ def display_discovered_devices(
                     watts = energy.current_consumption
                     power = f"{watts:.1f} W"
             except Exception as e:
-                logger.debug(
-                    f"Error getting power consumption for {name}: {e}"
-                )
+                logger.debug(f"Error getting power consumption for {name}: {e}")
                 power = "Error"
 
         table.add_row(
@@ -425,9 +407,7 @@ def display_discovered_devices(
         index += 1
 
     console.print(table)
-    console.print(
-        f"Found {len(device_list)} Kasa devices on your network.\n"
-    )
+    console.print(f"Found {len(device_list)} Kasa devices on your network.\n")
 
     return device_list
 

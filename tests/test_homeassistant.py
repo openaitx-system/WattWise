@@ -2,9 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-from wattwise.homeassistant import HomeAssistant, HomeAssistantError
+from wattwise.homeassistant import HomeAssistant
 
 
 class TestHomeAssistantInit:

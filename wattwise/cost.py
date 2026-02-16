@@ -21,9 +21,7 @@ def format_cost(cost: float, symbol: str = "$") -> str:
     return f"{symbol}{cost:.2f}"
 
 
-def estimate_costs(
-    watts: float, rate: float, symbol: str = "$"
-) -> dict[str, str]:
+def estimate_costs(watts: float, rate: float, symbol: str = "$") -> dict[str, str]:
     """Estimate costs for various time periods.
 
     Args:

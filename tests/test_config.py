@@ -4,7 +4,6 @@ import base64
 import os
 from unittest.mock import patch
 
-import pytest
 import yaml
 
 from wattwise import config
@@ -38,11 +37,11 @@ class TestLoadConfig:
     def test_load_creates_default_if_missing(self, tmp_path):
         config_path = tmp_path / "config.yaml"
         with patch.object(config, "get_config_dir", return_value=str(tmp_path)):
-            with patch.object(
-                config, "get_config_path", return_value=str(config_path)
-            ):
+            with patch.object(config, "get_config_path", return_value=str(config_path)):
                 with patch.object(
-                    config, "get_token_path", return_value=str(tmp_path / "token.secret")
+                    config,
+                    "get_token_path",
+                    return_value=str(tmp_path / "token.secret"),
                 ):
                     cfg = config.load_config()
 
@@ -66,11 +65,11 @@ class TestLoadConfig:
             yaml.dump(test_config, f)
 
         with patch.object(config, "get_config_dir", return_value=str(tmp_path)):
-            with patch.object(
-                config, "get_config_path", return_value=str(config_path)
-            ):
+            with patch.object(config, "get_config_path", return_value=str(config_path)):
                 with patch.object(
-                    config, "get_token_path", return_value=str(tmp_path / "token.secret")
+                    config,
+                    "get_token_path",
+                    return_value=str(tmp_path / "token.secret"),
                 ):
                     cfg = config.load_config()
 
@@ -98,9 +97,7 @@ class TestLoadConfig:
             f.write(encoded_token)
 
         with patch.object(config, "get_config_dir", return_value=str(tmp_path)):
-            with patch.object(
-                config, "get_config_path", return_value=str(config_path)
-            ):
+            with patch.object(config, "get_config_path", return_value=str(config_path)):
                 with patch.object(
                     config, "get_token_path", return_value=str(token_path)
                 ):
@@ -125,9 +122,7 @@ class TestSaveConfig:
         }
 
         with patch.object(config, "get_config_dir", return_value=str(tmp_path)):
-            with patch.object(
-                config, "get_config_path", return_value=str(config_path)
-            ):
+            with patch.object(config, "get_config_path", return_value=str(config_path)):
                 with patch.object(
                     config, "get_token_path", return_value=str(token_path)
                 ):

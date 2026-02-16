@@ -1,8 +1,6 @@
 """Tests for wattwise.datasource protocol conformance."""
 
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import patch
 
 from wattwise.datasource import CurrentCapable, DataSource
 from wattwise.homeassistant import HomeAssistant

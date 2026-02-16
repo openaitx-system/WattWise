@@ -1,5 +1,7 @@
 """Tests for wattwise.cost module."""
 
+import pytest
+
 from wattwise.cost import calculate_cost, estimate_costs, format_cost
 
 
@@ -55,6 +57,3 @@ class TestEstimateCosts:
     def test_custom_symbol(self):
         costs = estimate_costs(100, 0.15, "GBP ")
         assert costs["hourly"].startswith("GBP ")
-
-
-import pytest

@@ -1,7 +1,5 @@
 """Shared fixtures for WattWise tests."""
 
-import json
-import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -70,8 +68,6 @@ def mock_kasa_device():
     energy_module.consumption_this_month = 75.0
 
     # Module.Energy key mock
-    from unittest.mock import PropertyMock
-
     device.modules = {MagicMock(): energy_module}
 
     # Make update() async
@@ -86,7 +82,5 @@ def mock_discover_single(mock_kasa_device):
     device, _ = mock_kasa_device
     with patch("wattwise.kasa.Discover") as mock_discover:
         mock_discover.discover_single = AsyncMock(return_value=device)
-        mock_discover.discover = AsyncMock(
-            return_value={"192.168.1.100": device}
-        )
+        mock_discover.discover = AsyncMock(return_value={"192.168.1.100": device})
         yield mock_discover

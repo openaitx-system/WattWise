@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from wattwise.kasa import KasaDevice, KasaError, discover_devices_sync
+from wattwise.kasa import KasaDevice, discover_devices_sync
 
 
 @pytest.fixture
@@ -175,9 +175,7 @@ class TestDiscoverDevicesSync:
         mock_dev.is_on = True
         mock_dev.has_emeter = False
 
-        mock_discover.discover = AsyncMock(
-            return_value={"192.168.1.100": mock_dev}
-        )
+        mock_discover.discover = AsyncMock(return_value={"192.168.1.100": mock_dev})
         result = discover_devices_sync(display=False)
         assert len(result) == 1
         assert result[0]["ip"] == "192.168.1.100"

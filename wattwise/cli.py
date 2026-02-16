@@ -96,7 +96,9 @@ def show_config() -> None:
         ha_stats = {
             "host": ha_config["host"],
             "entity_id": f"Power: {ha_config.get('entity_id', 'Not configured')}",
-            "current_entity_id": f"Current: {ha_config.get('current_entity_id', 'Not configured')}",
+            "current_entity_id": (
+                f"Current: {ha_config.get('current_entity_id', 'Not configured')}"
+            ),
             "token": token_display,
         }
         display_mgr.display_stats("Home Assistant Configuration", ha_stats)
@@ -153,9 +155,7 @@ def configure_ha() -> None:
         power_entity_id = f"sensor.{device_name}_current_consumption"
         current_entity_id = f"sensor.{device_name}_current"
 
-        console.print(
-            f"[dim]Using power sensor: [cyan]{power_entity_id}[/cyan][/dim]"
-        )
+        console.print(f"[dim]Using power sensor: [cyan]{power_entity_id}[/cyan][/dim]")
         console.print(
             f"[dim]Using current sensor: [cyan]{current_entity_id}[/cyan][/dim]"
         )
@@ -184,12 +184,11 @@ def configure_ha() -> None:
             if success:
                 display_mgr.show_success("Home Assistant", "Connection successful!")
             else:
-                display_mgr.show_error(
-                    "Home Assistant", f"Connection failed: {error}"
-                )
+                display_mgr.show_error("Home Assistant", f"Connection failed: {error}")
         else:
             console.print(
-                "[yellow]Note: Both Home Assistant host and token are required.[/yellow]"
+                "[yellow]Note: Both Home Assistant host "
+                "and token are required.[/yellow]"
             )
 
         config.save_config(cfg)
@@ -199,13 +198,15 @@ def configure_ha() -> None:
 
         console.print("\n[bold]Next steps:[/bold]")
         console.print(
-            "- Run [bold cyan]wattwise[/bold cyan] to see your current power usage"
+            "- Run [bold cyan]wattwise[/bold cyan] to see current power usage"
         )
         console.print(
-            "- Run [bold cyan]wattwise --current[/bold cyan] to see both power and current"
+            "- Run [bold cyan]wattwise --current[/bold cyan] "
+            "to see both power and current"
         )
         console.print(
-            "- Run [bold cyan]wattwise --watch[/bold cyan] to continuously monitor power usage"
+            "- Run [bold cyan]wattwise --watch[/bold cyan] "
+            "to continuously monitor power usage"
         )
 
     except Exception as e:
@@ -223,9 +224,7 @@ def configure_kasa() -> None:
         cfg = config.load_config()
         display_mgr = display.DisplayManager(cfg)
 
-        console.print(
-            "[bold blue]WattWise - Kasa Smart Plug Configuration[/bold blue]"
-        )
+        console.print("[bold blue]WattWise - Kasa Smart Plug Configuration[/bold blue]")
 
         console.print("\n[bold]Discovering Kasa devices on your network...[/bold]")
         discovered_devices = kasa.discover_devices_sync(timeout=8)
@@ -237,9 +236,11 @@ def configure_kasa() -> None:
             console.print("\n[bold]Select a device to configure:[/bold]")
             selection = Prompt.ask(
                 "Enter device number, or enter IP address manually",
-                default=""
-                if not cfg["kasa"].get("device_ip")
-                else cfg["kasa"].get("device_ip"),
+                default=(
+                    ""
+                    if not cfg["kasa"].get("device_ip")
+                    else cfg["kasa"].get("device_ip")
+                ),
             )
 
             try:
@@ -285,9 +286,7 @@ def configure_kasa() -> None:
         )
 
         if require_auth:
-            username = Prompt.ask(
-                "Username", default=cfg["kasa"].get("username", "")
-            )
+            username = Prompt.ask("Username", default=cfg["kasa"].get("username", ""))
             cfg["kasa"]["username"] = username
 
             password = Prompt.ask(
@@ -315,29 +314,24 @@ def configure_kasa() -> None:
                 if success:
                     display_mgr.show_success("Kasa Device", "Connection successful!")
                 else:
-                    display_mgr.show_error(
-                        "Kasa Device", f"Connection failed: {error}"
-                    )
+                    display_mgr.show_error("Kasa Device", f"Connection failed: {error}")
             except Exception as e:
-                display_mgr.show_error(
-                    "Kasa Device", f"Connection test failed: {e}"
-                )
+                display_mgr.show_error("Kasa Device", f"Connection test failed: {e}")
         else:
             console.print(
                 "[yellow]Note: Device IP is required to test connection.[/yellow]"
             )
 
         config.save_config(cfg)
-        display_mgr.show_success(
-            "Configuration", "Kasa settings saved successfully!"
-        )
+        display_mgr.show_success("Configuration", "Kasa settings saved successfully!")
 
         console.print("\n[bold]Next steps:[/bold]")
         console.print(
-            "- Run [bold cyan]wattwise[/bold cyan] to see your current power usage"
+            "- Run [bold cyan]wattwise[/bold cyan] to see current power usage"
         )
         console.print(
-            "- Run [bold cyan]wattwise --watch[/bold cyan] to continuously monitor power usage"
+            "- Run [bold cyan]wattwise --watch[/bold cyan] "
+            "to continuously monitor power usage"
         )
 
     except Exception as e:
@@ -361,9 +355,7 @@ def fix_permissions() -> None:
         config_dir_writable = (
             os.access(config_dir, os.W_OK) if config_dir_exists else False
         )
-        data_dir_writable = (
-            os.access(data_dir, os.W_OK) if data_dir_exists else False
-        )
+        data_dir_writable = os.access(data_dir, os.W_OK) if data_dir_exists else False
 
         need_sudo = (config_dir_exists and not config_dir_writable) or (
             data_dir_exists and not data_dir_writable
@@ -375,22 +367,26 @@ def fix_permissions() -> None:
         try:
             os.chmod(config_dir, 0o755)
             console.print(
-                f"[green]\\u2713[/green] Set permissions on config directory: {config_dir}"
+                f"[green]\\u2713[/green] Set permissions on "
+                f"config directory: {config_dir}"
             )
         except Exception as e:
             console.print(
-                f"[red]\\u2717[/red] Could not set permissions on config directory: {e}"
+                f"[red]\\u2717[/red] Could not set permissions "
+                f"on config directory: {e}"
             )
             need_sudo = True
 
         try:
             os.chmod(data_dir, 0o755)
             console.print(
-                f"[green]\\u2713[/green] Set permissions on data directory: {data_dir}"
+                f"[green]\\u2713[/green] Set permissions on "
+                f"data directory: {data_dir}"
             )
         except Exception as e:
             console.print(
-                f"[red]\\u2717[/red] Could not set permissions on data directory: {e}"
+                f"[red]\\u2717[/red] Could not set permissions "
+                f"on data directory: {e}"
             )
             need_sudo = True
 
@@ -399,11 +395,13 @@ def fix_permissions() -> None:
             try:
                 os.chmod(config_path, 0o644)
                 console.print(
-                    f"[green]\\u2713[/green] Set permissions on config file: {config_path}"
+                    f"[green]\\u2713[/green] Set permissions "
+                    f"on config file: {config_path}"
                 )
             except Exception as e:
                 console.print(
-                    f"[red]\\u2717[/red] Could not set permissions on config file: {e}"
+                    f"[red]\\u2717[/red] Could not set "
+                    f"permissions on config file: {e}"
                 )
                 need_sudo = True
 
@@ -412,21 +410,25 @@ def fix_permissions() -> None:
             try:
                 os.chmod(token_path, 0o600)
                 console.print(
-                    f"[green]\\u2713[/green] Set permissions on token file: {token_path}"
+                    f"[green]\\u2713[/green] Set permissions "
+                    f"on token file: {token_path}"
                 )
             except Exception as e:
                 console.print(
-                    f"[red]\\u2717[/red] Could not set permissions on token file: {e}"
+                    f"[red]\\u2717[/red] Could not set "
+                    f"permissions on token file: {e}"
                 )
                 need_sudo = True
                 try:
                     os.remove(token_path)
                     console.print(
-                        f"[yellow]![/yellow] Removed problematic token file: {token_path}"
+                        f"[yellow]![/yellow] Removed problematic "
+                        f"token file: {token_path}"
                     )
                 except Exception as remove_error:
                     console.print(
-                        f"[red]\\u2717[/red] Could not remove problematic token file: {remove_error}"
+                        f"[red]\\u2717[/red] Could not remove "
+                        f"problematic token file: {remove_error}"
                     )
 
         history_path = os.path.join(data_dir, "history.json")
@@ -434,11 +436,13 @@ def fix_permissions() -> None:
             try:
                 os.chmod(history_path, 0o644)
                 console.print(
-                    f"[green]\\u2713[/green] Set permissions on history file: {history_path}"
+                    f"[green]\\u2713[/green] Set permissions "
+                    f"on history file: {history_path}"
                 )
             except Exception as e:
                 console.print(
-                    f"[red]\\u2717[/red] Could not set permissions on history file: {e}"
+                    f"[red]\\u2717[/red] Could not set "
+                    f"permissions on history file: {e}"
                 )
                 need_sudo = True
 
@@ -449,24 +453,30 @@ def fix_permissions() -> None:
                 "\n[bold yellow]Permissions could not be fully fixed.[/bold yellow]"
             )
             console.print(
-                "You need to run the following command to take ownership of the configuration files:"
+                "Run the following command to take ownership "
+                "of the configuration files:"
             )
             console.print(
-                "[bold cyan]sudo chown -R $USER:$USER ~/.config/wattwise ~/.local/share/wattwise[/bold cyan]"
+                "[bold cyan]sudo chown -R $USER:$USER "
+                "~/.config/wattwise "
+                "~/.local/share/wattwise[/bold cyan]"
             )
         else:
             console.print(
-                "\n[bold green]All permissions have been set correctly![/bold green]"
+                "\n[bold green]All permissions set correctly!" "[/bold green]"
             )
             console.print(
-                "You can now run [bold cyan]wattwise config kasa[/bold cyan] to set up your device."
+                "You can now run [bold cyan]wattwise config "
+                "kasa[/bold cyan] to set up your device."
             )
 
         console.print(
             "\n[dim]If you continue to have issues, you can always try:[/dim]"
         )
         console.print(
-            "[dim cyan]sudo chown -R $USER:$USER ~/.config/wattwise ~/.local/share/wattwise[/dim cyan]"
+            "[dim cyan]sudo chown -R $USER:$USER "
+            "~/.config/wattwise "
+            "~/.local/share/wattwise[/dim cyan]"
         )
 
     except Exception as e:
@@ -476,7 +486,9 @@ def fix_permissions() -> None:
             "[bold yellow]Try running the following command instead:[/bold yellow]"
         )
         console.print(
-            "[bold cyan]sudo chown -R $USER:$USER ~/.config/wattwise ~/.local/share/wattwise[/bold cyan]"
+            "[bold cyan]sudo chown -R $USER:$USER "
+            "~/.config/wattwise "
+            "~/.local/share/wattwise[/bold cyan]"
         )
         raise typer.Exit(code=1)
 
@@ -551,7 +563,8 @@ def view(
             )
             kasa.discover_devices_sync(timeout=10)
             console.print(
-                "\nTo configure a device, run: [bold cyan]wattwise config kasa[/bold cyan]"
+                "\nTo configure a device, run: "
+                "[bold cyan]wattwise config kasa[/bold cyan]"
             )
             return
 
@@ -560,12 +573,15 @@ def view(
             display_mgr = display.DisplayManager({})
             display_mgr.show_error(
                 "Permission Error",
-                "No write permission on configuration directory. Please run the following command to fix:",
+                "No write permission on config directory. "
+                "Please run the following command to fix:",
             )
             console.print("\n[bold cyan]wattwise config fix-permissions[/bold cyan]")
             console.print("\nIf that doesn't work, you may need to run:")
             console.print(
-                "[bold cyan]sudo chown -R $USER:$USER ~/.config/wattwise ~/.local/share/wattwise[/bold cyan]"
+                "[bold cyan]sudo chown -R $USER:$USER "
+                "~/.config/wattwise "
+                "~/.local/share/wattwise[/bold cyan]"
             )
             raise typer.Exit(code=1)
 
@@ -576,14 +592,13 @@ def view(
         # If --device is specified, look it up in multi-device config
         if device:
             devices = _get_devices_from_config(cfg)
-            dev_cfg = next(
-                (d for d in devices if d.get("name") == device), None
-            )
+            dev_cfg = next((d for d in devices if d.get("name") == device), None)
             if not dev_cfg:
                 display_mgr.show_error(
                     "Device Error",
                     f"Device '{device}' not found. "
-                    "Run [bold cyan]wattwise devices list[/bold cyan] to see available devices.",
+                    "Run [bold cyan]wattwise devices list"
+                    "[/bold cyan] to see available devices.",
                 )
                 raise typer.Exit(code=1)
 
@@ -616,7 +631,7 @@ def view(
 
                 display_mgr.show_error(
                     "Configuration Error",
-                    "No data sources configured. You need to set up a data source first.",
+                    "No data sources configured. " "Set up a data source first.",
                 )
 
                 console.print(
@@ -636,19 +651,24 @@ def view(
                             "\n[yellow]No Kasa devices found on your network.[/yellow]"
                         )
                         console.print(
-                            "If you have Kasa devices, make sure they are powered on and connected to your network."
+                            "If you have Kasa devices, make sure "
+                            "they are powered on and connected "
+                            "to your network."
                         )
                 except Exception as e:
                     logger.warning(f"Error discovering devices: {e}")
 
                 console.print(
-                    "\n[bold]Please run one of the following commands to configure WattWise:[/bold]"
+                    "\n[bold]Please run one of the following "
+                    "commands to configure WattWise:[/bold]"
                 )
                 console.print(
-                    "- [bold cyan]wattwise config kasa[/bold cyan] - Configure Kasa smart plug"
+                    "- [bold cyan]wattwise config kasa"
+                    "[/bold cyan] - Configure Kasa smart plug"
                 )
                 console.print(
-                    "- [bold cyan]wattwise config ha[/bold cyan] - Configure Home Assistant"
+                    "- [bold cyan]wattwise config ha"
+                    "[/bold cyan] - Configure Home Assistant"
                 )
                 console.print("\nTo discover all available Kasa devices, run:")
                 console.print("[bold cyan]wattwise --discover[/bold cyan]")
@@ -656,7 +676,6 @@ def view(
                 raise typer.Exit(code=1)
 
             # Create data source — both backends now implement the same interface
-            data_source: Any
             if use_ha or mock:
                 current_entity_id = (
                     ha_config.get("current_entity_id") if show_current else None
@@ -679,7 +698,9 @@ def view(
 
                 if mock:
                     console.print(
-                        "[bold yellow]Using mock data mode - no real connection to Home Assistant[/bold yellow]"
+                        "[bold yellow]Using mock data mode - "
+                        "no real connection to "
+                        "Home Assistant[/bold yellow]"
                     )
 
                 data_source = ha_client
@@ -725,7 +746,11 @@ def view(
                     history_data = json.load(f)
 
                     # Both backends now use consistent attribute names
-                    power_key = "power_history" if hasattr(data_source, "power_history") else "history"
+                    power_key = (
+                        "power_history"
+                        if hasattr(data_source, "power_history")
+                        else "history"
+                    )
                     power_list = getattr(data_source, power_key, [])
                     if not power_list:
                         setattr(data_source, power_key, history_data.get("power", []))
@@ -737,9 +762,7 @@ def view(
                             )
 
                     loaded_power = len(getattr(data_source, power_key, []))
-                    loaded_current = len(
-                        getattr(data_source, "current_history", [])
-                    )
+                    loaded_current = len(getattr(data_source, "current_history", []))
                     logger.info(
                         f"Loaded {loaded_power} power readings and "
                         f"{loaded_current} current readings from history"
@@ -762,7 +785,11 @@ def view(
                 )
             else:
                 _fetch_and_display_usage(
-                    data_source, display_mgr, show_current, source_name, raw,
+                    data_source,
+                    display_mgr,
+                    show_current,
+                    source_name,
+                    raw,
                     energy_config=energy_cfg,
                 )
         except KeyboardInterrupt:
@@ -774,9 +801,7 @@ def view(
 
     except config.ConfigError as e:
         console.print(f"[bold red]Configuration Error:[/bold red] {e}")
-        console.print(
-            "\nYou may need to run this command to fix permission issues:"
-        )
+        console.print("\nYou may need to run this command to fix permission issues:")
         console.print("[bold cyan]wattwise config fix-permissions[/bold cyan]")
         raise typer.Exit(code=1)
     except Exception as e:
@@ -824,7 +849,7 @@ def _watch_power_usage(
 
     def get_power() -> float | None:
         try:
-            watts = data_source.get_power_usage()
+            watts: float | None = data_source.get_power_usage()
             # Check alerts
             if watts is not None and alert_manager is not None:
                 alert_msg = alert_manager.check(watts)
@@ -836,12 +861,14 @@ def _watch_power_usage(
             return None
 
     def get_power_trend(mins: int) -> dict[str, Any] | None:
-        return data_source.get_power_trend(mins)
+        result: dict[str, Any] | None = data_source.get_power_trend(mins)
+        return result
 
     def get_current() -> float | None:
         if show_current and is_current_capable:
             try:
-                return data_source.get_current_amperage()
+                result: float | None = data_source.get_current_amperage()
+                return result
             except Exception as e:
                 logger.error(f"Error getting current data: {e}")
                 return None
@@ -849,7 +876,8 @@ def _watch_power_usage(
 
     def get_current_trend(mins: int) -> dict[str, Any] | None:
         if show_current and is_current_capable:
-            return data_source.get_current_trend(mins)
+            trend: dict[str, Any] | None = data_source.get_current_trend(mins)
+            return trend
         return None
 
     display_mgr.display_continuous_usage(
@@ -920,9 +948,7 @@ def _fetch_and_display_usage(
 
 @app.command("export")
 def export_cmd(
-    fmt: str = typer.Option(
-        "csv", "--format", "-f", help="Output format: csv or json"
-    ),
+    fmt: str = typer.Option("csv", "--format", "-f", help="Output format: csv or json"),
     output: str = typer.Option(
         "wattwise_export.csv",
         "--output",
@@ -950,12 +976,8 @@ def export_cmd(
         raise typer.Exit(code=1)
 
     try:
-        count = export_history(
-            history_file, output, fmt=fmt, start=start, end=end
-        )
-        console.print(
-            f"[bold green]Exported {count} records to {output}[/bold green]"
-        )
+        count = export_history(history_file, output, fmt=fmt, start=start, end=end)
+        console.print(f"[bold green]Exported {count} records to {output}[/bold green]")
     except ValueError as e:
         console.print(f"[bold red]Error:[/bold red] {e}")
         raise typer.Exit(code=1)
@@ -971,9 +993,7 @@ def export_cmd(
 
 @app.command("cost")
 def cost_cmd(
-    watts: float = typer.Option(
-        ..., "--watts", "-W", help="Power draw in watts"
-    ),
+    watts: float = typer.Option(..., "--watts", "-W", help="Power draw in watts"),
     rate: Optional[float] = typer.Option(
         None, "--rate", "-r", help="Energy rate per kWh (overrides config)"
     ),
@@ -985,8 +1005,8 @@ def cost_cmd(
     cfg = config.load_config()
     energy_cfg = cfg.get("energy", {})
     effective_rate = rate if rate is not None else energy_cfg.get("rate", 0.12)
-    effective_symbol = symbol if symbol is not None else energy_cfg.get(
-        "currency_symbol", "$"
+    effective_symbol = (
+        symbol if symbol is not None else energy_cfg.get("currency_symbol", "$")
     )
 
     costs = estimate_costs(watts, effective_rate, effective_symbol)
@@ -995,9 +1015,7 @@ def cost_cmd(
     console.print(f"  Daily:   {costs['daily']}")
     console.print(f"  Monthly: {costs['monthly']}")
     console.print(f"  Yearly:  {costs['yearly']}")
-    console.print(
-        f"\n[dim]Rate: {effective_symbol}{effective_rate:.4f}/kWh[/dim]"
-    )
+    console.print(f"\n[dim]Rate: {effective_symbol}{effective_rate:.4f}/kWh[/dim]")
 
 
 # ---------------------------------------------------------------------------
@@ -1010,13 +1028,13 @@ def _get_devices_from_config(
 ) -> list[dict[str, Any]]:
     """Get the devices list, synthesizing from legacy config if needed."""
     if "devices" in cfg:
-        devices = cfg.get("devices") or []
+        devices: list[dict[str, Any]] = cfg.get("devices") or []
         return devices
     if not allow_legacy:
         return []
 
     # Synthesize from legacy single-device config
-    devices: list[dict[str, Any]] = []
+    devices = []
     ha = cfg.get("homeassistant", {})
     if ha.get("host") and ha.get("token"):
         devices.append(
@@ -1123,12 +1141,8 @@ def devices_add(
     device_ip: Optional[str] = typer.Option(
         None, "--ip", help="Kasa device IP address"
     ),
-    host: Optional[str] = typer.Option(
-        None, "--host", help="Home Assistant host URL"
-    ),
-    token: Optional[str] = typer.Option(
-        None, "--token", help="Home Assistant token"
-    ),
+    host: Optional[str] = typer.Option(None, "--host", help="Home Assistant host URL"),
+    token: Optional[str] = typer.Option(None, "--token", help="Home Assistant token"),
     entity_id: Optional[str] = typer.Option(
         None, "--entity-id", help="Home Assistant power entity ID"
     ),
@@ -1150,9 +1164,7 @@ def devices_add(
 
     # Check for duplicate name
     if any(d.get("name") == name for d in devices):
-        console.print(
-            f"[bold red]Error:[/bold red] Device '{name}' already exists."
-        )
+        console.print(f"[bold red]Error:[/bold red] Device '{name}' already exists.")
         raise typer.Exit(code=1)
 
     new_device: dict[str, Any] = {"name": name, "type": dev_type}
@@ -1168,7 +1180,8 @@ def devices_add(
         if not host or not token or not entity_id:
             console.print(
                 "[bold red]Error:[/bold red] "
-                "--host, --token, and --entity-id are required for homeassistant devices."
+                "--host, --token, and --entity-id are "
+                "required for homeassistant devices."
             )
             raise typer.Exit(code=1)
         new_device["host"] = host
@@ -1180,9 +1193,7 @@ def devices_add(
     devices.append(new_device)
     cfg["devices"] = devices
     config.save_config(cfg)
-    console.print(
-        f"[bold green]Added device '{name}' ({dev_type})[/bold green]"
-    )
+    console.print(f"[bold green]Added device '{name}' ({dev_type})[/bold green]")
 
 
 @devices_app.command("remove")
@@ -1199,9 +1210,7 @@ def devices_remove(
     devices = [d for d in devices if d.get("name") != name]
 
     if len(devices) == original_len:
-        console.print(
-            f"[bold red]Error:[/bold red] Device '{name}' not found."
-        )
+        console.print(f"[bold red]Error:[/bold red] Device '{name}' not found.")
         raise typer.Exit(code=1)
 
     cfg["devices"] = devices
