@@ -1,11 +1,5 @@
-#!/usr/bin/env python3
-"""
-WattWise - A CLI tool for monitoring power usage of devices connected to smart plugs.
+"""Backward-compatible module shim for legacy imports."""
 
-This script is the entry point for the installed application.
-"""
+from .cli import app, main
 
-from wattwise.cli import main
-
-if __name__ == "__main__":
-    main() 
+__all__ = ["app", "main"]
