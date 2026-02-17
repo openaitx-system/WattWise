@@ -16,9 +16,6 @@ A lightweight CLI tool for monitoring power usage from smart plugs in real-time,
 - Continuous monitoring with charts and historical data
 - Simple command-line interface
 
-## Latest changes
-- v0.1.4 : Uses latest python-kasa version(0.10.2), various fixes and improvements.
-
 ## Installation
 
 ### Via pip
@@ -50,6 +47,21 @@ docker run -it --rm --network host \
   -v ~/.config/wattwise:/root/.config/wattwise \
   -v ~/.local/share/wattwise:/root/.local/share/wattwise \
   wattwise config kasa
+
+# Optional: Add additional devices (multi-device config)
+docker run -it --rm --network host \
+  -v ~/.config/wattwise:/root/.config/wattwise \
+  -v ~/.local/share/wattwise:/root/.local/share/wattwise \
+  wattwise devices add --name "PC" --type kasa --ip 192.168.1.50
+
+docker run -it --rm --network host \
+  -v ~/.config/wattwise:/root/.config/wattwise \
+  -v ~/.local/share/wattwise:/root/.local/share/wattwise \
+  wattwise devices add --name "Server" --type homeassistant \
+    --host http://homeassistant.local:8123 \
+    --token $HA_TOKEN \
+    --entity-id sensor.server_power \
+    --current-entity-id sensor.server_current
 
 # 4. Run a single check with Docker
 docker run -it --rm --network host \
@@ -153,11 +165,21 @@ wattwise --raw --watch
 # Specify data source manually
 wattwise --source homeassistant
 wattwise --source kasa
+
+# Manage multiple devices
+wattwise devices list
+wattwise devices add --name "PC" --type kasa --ip 192.168.1.50
+wattwise devices add --name "Server" --type homeassistant \
+  --host http://homeassistant.local:8123 \
+  --token $HA_TOKEN \
+  --entity-id sensor.server_power \
+  --current-entity-id sensor.server_current
+wattwise --device "PC"
 ```
 
 ## Requirements
 
-- Python 3.8 or later
+- Python 3.11 or later
 - A TP-Link Kasa smart plug connected to your equipment
 - Optional: Home Assistant setup with the Kasa integration
 
@@ -185,6 +207,7 @@ alias wattwise='docker run -it --rm --network host \
 wattwise  # Single reading
 wattwise --watch  # Continuous monitoring
 wattwise config fix-permissions  # Fix directory permissions
+wattwise --device "PC"  # Target a specific configured device
 ```
 
 ## License

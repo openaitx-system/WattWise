@@ -1,5 +1,6 @@
-from setuptools import setup, find_packages
 import re
+
+from setuptools import find_packages, setup
 
 # Read version from the __init__ file
 with open("wattwise/__init__.py", encoding="utf-8") as f:
@@ -10,7 +11,9 @@ setup(
     version=version,
     author="Naveen",
     author_email="hey@naveen.ing",
-    description="A CLI tool for monitoring power usage by devices plugged into smart plugs",
+    description=(
+        "A CLI tool for monitoring power usage " "by devices plugged into smart plugs"
+    ),
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/naveenkul/wattwise",
@@ -22,17 +25,30 @@ setup(
         "python-kasa>=0.10.2",
         "requests>=2.28.0",
         "pyyaml>=6.0",
-        "asyncio>=3.4.3",
     ],
+    extras_require={
+        "dev": [
+            "pytest>=7.0",
+            "pytest-cov>=4.0",
+            "pytest-mock>=3.10",
+            "pytest-asyncio>=0.21",
+            "black>=23.0",
+            "isort>=5.12",
+            "mypy>=1.0",
+            "flake8>=6.0",
+            "types-requests>=2.28",
+            "types-PyYAML>=6.0",
+        ],
+    },
     entry_points="""
         [console_scripts]
         wattwise=wattwise.cli:app
     """,
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Development Status :: 4 - Beta",
@@ -40,5 +56,5 @@ setup(
         "Intended Audience :: End Users/Desktop",
         "Topic :: Utilities",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.11",
 )
